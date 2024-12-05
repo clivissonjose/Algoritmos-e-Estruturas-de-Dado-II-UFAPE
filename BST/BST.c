@@ -36,6 +36,22 @@ void imprimirPreOrdem(arvore raiz){
   }
 }
 
+void imprimirEmOrdem(arvore raiz){
+  if(raiz){  
+    imprimirEmOrdem(raiz->esq);
+    printf("%d ", raiz->valor);
+    imprimirEmOrdem(raiz->dir);
+  }
+}
+void imprimirPosOrdem(arvore raiz){
+
+  if(raiz){
+    imprimirPosOrdem(raiz->esq);
+    imprimirPosOrdem(raiz->dir);
+    printf("%d ", raiz->valor);
+  }
+}
+
 arvore maiorElemento(arvore raiz){
   arvore temp = raiz;
 

@@ -10,6 +10,8 @@ typedef no *arvore;
 
 arvore inserir(arvore raiz, int valor);
 void imprimirPreOrdem(arvore raiz);
+void imprimirEmOrdem(arvore raiz);
+void imprimirPosOrdem(arvore raiz);
 arvore remover(arvore raiz, int valor);
 arvore maiorElmento(arvore raiz);
 

@@ -20,6 +20,10 @@ int main(){
 
       case 2:
         imprimirPreOrdem(a);
+        printf("\n");
+        imprimirEmOrdem(a);
+        printf("\n");
+        imprimirPosOrdem(a);
         break;
 
       case 3:
