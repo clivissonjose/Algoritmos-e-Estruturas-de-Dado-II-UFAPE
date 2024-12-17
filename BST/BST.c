@@ -34,6 +34,7 @@ void imprimirPreOrdem(arvore raiz){
     imprimirPreOrdem(raiz->esq);
     imprimirPreOrdem(raiz->dir);
   }
+
 }
 
 void imprimirEmOrdem(arvore raiz){
@@ -50,6 +51,7 @@ void imprimirPosOrdem(arvore raiz){
     imprimirPosOrdem(raiz->dir);
     printf("%d ", raiz->valor);
   }
+
 }
 
 arvore maiorElemento(arvore raiz){
@@ -119,4 +121,16 @@ arvore remover(arvore raiz, int valor){
     }
      
   }
+}
+
+int altura(arvore raiz){
+  
+   if(raiz == NULL){
+     return 0;
+   }
+
+   int alturaDireita = altura(raiz->dir);
+   int alturaEsquerda = altura(raiz->esq);
+
+   return 1 + (alturaDireita > alturaEsquerda ? alturaDireita : alturaEsquerda);
 }
