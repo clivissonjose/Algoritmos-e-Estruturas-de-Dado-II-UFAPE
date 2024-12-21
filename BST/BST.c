@@ -30,7 +30,7 @@ arvore inserir(arvore  raiz, int valor){
 
 void imprimirPreOrdem(arvore raiz){
   if(raiz){
-    printf("%d ", raiz->valor);
+    printf("[%d]", raiz->valor);
     imprimirPreOrdem(raiz->esq);
     imprimirPreOrdem(raiz->dir);
   }
@@ -40,7 +40,7 @@ void imprimirPreOrdem(arvore raiz){
 void imprimirEmOrdem(arvore raiz){
   if(raiz){  
     imprimirEmOrdem(raiz->esq);
-    printf("%d ", raiz->valor);
+    printf("[%d]", raiz->valor);
     imprimirEmOrdem(raiz->dir);
   }
 }
@@ -49,7 +49,7 @@ void imprimirPosOrdem(arvore raiz){
   if(raiz){
     imprimirPosOrdem(raiz->esq);
     imprimirPosOrdem(raiz->dir);
-    printf("%d ", raiz->valor);
+    printf("[%d]", raiz->valor);
   }
 
 }
@@ -133,4 +133,106 @@ int altura(arvore raiz){
    int alturaEsquerda = altura(raiz->esq);
 
    return 1 + (alturaDireita > alturaEsquerda ? alturaDireita : alturaEsquerda);
+}
+
+int somaCaminho(arvore raiz, int valor){
+
+      if(raiz == NULL){
+        return 0;
+      }
+
+      if(raiz->valor == valor){
+        return valor;
+      }
+
+      if(valor >= raiz->valor){
+        int soma = 0;
+        soma += somaCaminho(raiz->dir, valor);
+
+        if(soma != 0){
+          return soma + raiz->valor;
+        }
+
+        return 0;
+      }else{
+        int soma = 0;
+        soma += somaCaminho(raiz->esq, valor);
+
+        if(soma != 0){
+          return soma + raiz->valor;
+        }
+
+        return 0;
+      }
+}
+
+void caminho(arvore raiz, int valor){
+
+  int valorExistente = valorExiste(raiz, valor);
+
+  if(valorExistente){
+
+        if(raiz->valor == valor){
+          printf("[%d]", raiz->valor);
+          return ;
+        }
+
+        printf("[%d]", raiz->valor);
+        if(valor >= raiz->valor){
+          caminho(raiz->dir, valor);
+        }
+
+        if(valor < raiz->valor){
+           caminho(raiz->esq, valor);
+        }
+
+  }
+
+}
+
+// Quantidade de folhas em uma arvore BST
+int qtdFolhas(arvore raiz){
+
+    if (raiz == NULL)
+       return 0;
+    if(raiz->esq == NULL && raiz->dir == NULL){
+         return 1;
+    }
+
+    int folhas = 0;
+    folhas += qtdFolhas(raiz->esq);
+    folhas += qtdFolhas(raiz->dir);
+
+    return folhas;
+
+}
+
+// Pegar o números de uma BST em ordem decrescente
+void reverso(arvore raiz){
+  if(raiz == NULL){
+    return;
+  }
+
+  reverso(raiz->dir);
+  printf("[%d]", raiz->valor);
+  reverso(raiz->esq);
+}
+
+// Se valor existir retorna 1 se não retorna 0
+int valorExiste(arvore raiz, int valor){
+
+  if(raiz==NULL){
+    return 0;
+  }
+
+  if(raiz->valor == valor){
+    return 1;
+  }
+
+  if(valor >= raiz->valor){
+    return valorExiste(raiz->dir, valor);
+  }
+
+  return valorExiste(raiz->esq, valor);
+
 }
