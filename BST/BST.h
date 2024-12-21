@@ -10,6 +10,11 @@ typedef no *arvore;
 
 arvore inserir(arvore raiz, int valor);
 int altura(arvore raiz);
+int qtdFolhas(arvore raiz);
+int somaCaminho(arvore raiz, int valor);
+void caminho(arvore raiz, int valor);
+void reverso(arvore raiz);
+int valorExiste(arvore raiz, int valor);
 void imprimirPreOrdem(arvore raiz);
 void imprimirEmOrdem(arvore raiz);
 void imprimirPosOrdem(arvore raiz);
