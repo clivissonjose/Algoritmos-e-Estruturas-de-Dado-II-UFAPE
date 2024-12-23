@@ -135,6 +135,8 @@ int altura(arvore raiz){
    return 1 + (alturaDireita > alturaEsquerda ? alturaDireita : alturaEsquerda);
 }
 
+
+// Questão da prova e não dos exercícios
 int somaCaminho(arvore raiz, int valor){
 
       if(raiz == NULL){
