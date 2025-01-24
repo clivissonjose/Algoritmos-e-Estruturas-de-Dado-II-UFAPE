@@ -41,7 +41,7 @@ arvore inserir(arvore  raiz, int valor, int *cresceu){
                     case -1:
                          raiz->fb = 0;
                         *cresceu = 0;
-                        break;
+                         break;
 
                 }
 
@@ -271,7 +271,7 @@ arvore remover(arvore raiz, int valor, int *diminuiu){
                 *diminuiu = 1;
                 break;
             case -1:
-                //*diminuiu ???
+                *diminuiu = (raiz->dir->fb == 0) ? 0 : 1;
                 return rotacionar(raiz);
                 break;
           }
@@ -279,18 +279,25 @@ arvore remover(arvore raiz, int valor, int *diminuiu){
 
         
       }else{
-        raiz->esq = remover(raiz->esq, valor, diminuiu);
-
-        if(*diminuiu){
-          switch(raiz->fb){
-            
-          }
-        }
-      }
-
+        
+          if (*diminuiu) {
+              switch (raiz->fb) {
+                  case 0:
+                        raiz->fb = 1;
+                        *diminuiu = 0;
+                         break;
+                  case -1:
+                        raiz->fb = 0;
+                        *diminuiu = 1;
+                        break;
+                  case 1:
+                        *diminuiu = (raiz->esq->fb == 0) ? 0 : 1;
+                        return rotacionar(raiz);
+                }
+            }
       return raiz;
     }
-     
+    } 
   }
 }
 
