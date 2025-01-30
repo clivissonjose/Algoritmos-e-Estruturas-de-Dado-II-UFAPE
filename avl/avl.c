@@ -84,41 +84,7 @@ int altura(arvore raiz){
    return 1 + (alturaDireita > alturaEsquerda ? alturaDireita : alturaEsquerda);
 }
 
-arvore rotacionar(arvore raiz){
-   
-   if(raiz->fb>0){
-      // rotacao  a esquerda
-      if(raiz->dir->fb >= 0){
-        return rotacaoSimplesEsquerda(raiz);
-      }else{
-        return rotacaoDuplaEsquerda(raiz);
-      }
 
-   }else{
-    // Rotacao Direita - IMPLEMENTAR
-
-      if (raiz->esq->fb <= 0) {
-            return rotacaoSimplesDireita(raiz);
-      } else {
-            return rotacaoDuplaDireita(raiz);
-      }
-   }
-}
-
-/*
-     p
-    / \
-   t1  u
-      / \
-     t2 t3
-
-     u
-    / \
-   p   t3
-  / \
- t1 t2
-
-*/
 arvore rotacaoSimplesEsquerda(arvore raiz){
 
    arvore p, u, t2;
@@ -131,21 +97,6 @@ arvore rotacaoSimplesEsquerda(arvore raiz){
     u->esq = p;
     p->dir = t2;
 
-    if(u->fb == 1) {
-      p->fb = 0;
-      u->fb = 0;
-	  } else {
-      p->fb = 1;
-      u->fb = -1;
-	  }	
-    
-  /*  if(u->fb == 0 ){
-        p->fb = 1;
-        u->fb = 0;
-      }else{
-        p->fb = 0;
-        u->fb = 0;
-      }  */
     return u;  
 
 }
@@ -161,15 +112,6 @@ arvore rotacaoSimplesDireita(arvore raiz){
     // Atualizar os ponteiros com o estado resultante
     u->dir = p;      // u se torna a nova raiz
     p->esq = t2;     // t2 se torna a subárvore esquerda de p
-
-    // Atualizar os fatores de balanceamento
-      if (u->fb == -1) {
-        p->fb = 0;
-        u->fb = 0;
-      } else {
-        p->fb = -1;
-        u->fb = 1;
-      }
 
       
     // Retornar a nova raiz
@@ -210,96 +152,133 @@ arvore maiorElemento(arvore raiz){
   return temp;
 }
 
-arvore remover(arvore raiz, int valor, int *diminuiu){
-
-  if(raiz == NULL){
-      return NULL;
-  }else{
-   
-    // Verificar se o valor foi encontrado
-    if(raiz->valor == valor){
-
-      // Caso 1: O valor é uma folha
-      if(raiz->dir == NULL && raiz->esq == NULL){
-        *diminuiu = 1;
-        free(raiz);
-        return NULL;  
-      }
-
-      // caso 2a: Raiz possui exatamente um filho a direita
-      if(raiz->dir != NULL && raiz->esq == NULL ){
-        *diminuiu = 1;
-         arvore raizResultante = raiz->dir;
-         free(raiz);
-         return raizResultante;
-      }
-
-      // caso 2b: A raiz possui exatemente um filho a esquerda
-      if(raiz->esq != NULL && raiz->dir == NULL){
-        *diminuiu = 1;
-        arvore raizResultante = raiz->esq;
-        free(raiz);
-        return raizResultante;
-      }
-
-      // Caso 3: A raiz possui dois filhos
-      if(raiz->dir != NULL && raiz->esq != NULL){
-
-         // Vamos encontrar o maior valor da subarvore a esquerda e substituir-lo no valor da raiz
-         raiz->valor = maiorElemento(raiz->esq)->valor;
-
-         // Aqui removemos o maior valor da subarvore a esquerda que está duplicado.
-         raiz->esq = remover(raiz->esq, raiz->valor, diminuiu);
-         
-         return raiz;  
-      }
-
-    }else{
-      // Procurar pelo elemento 
-
-      if(valor >= raiz->valor){
-        raiz->dir = remover(raiz->dir, valor, diminuiu);
-
-        if(*diminuiu){
-          switch(raiz->fb){
-            case 0:
-               raiz->fb = -1;
-               *diminuiu = 0;
-               break;
-            case 1:
-                raiz->fb = 0;
-                *diminuiu = 1;
-                break;
-            case -1:
-                *diminuiu = (raiz->dir->fb == 0) ? 0 : 1;
-                return rotacionar(raiz);
-                break;
-          }
+arvore rotacionar(arvore raiz){
+    arvore p = raiz;
+   if (p->fb > 0) {
+    // Rotacao simples a esquerda
+        arvore u = p->dir;        
+      
+        if (u->fb >= 0) {
+            if (u->fb == 1) {
+                p->fb = 0;
+                u->fb = 0;
+        } else {
+                p->fb = 1;
+                u->fb = -1;
         }
+        return rotacaoSimplesEsquerda(raiz);
+            
+        } else {
+          /// Rotacao dupla a esquerda
+            arvore v = u->esq;
 
-        
-      }else{
-        
-          if (*diminuiu) {
-              switch (raiz->fb) {
-                  case 0:
-                        raiz->fb = 1;
-                        *diminuiu = 0;
-                         break;
-                  case -1:
-                        raiz->fb = 0;
-                        *diminuiu = 1;
-                        break;
-                  case 1:
-                        *diminuiu = (raiz->esq->fb == 0) ? 0 : 1;
-                        return rotacionar(raiz);
-                }
+            if (v->fb == -1) {
+                p->fb = 0;
+                u->fb = 1;
+                v->fb = 0;
+            } else if (v->fb == 0) {
+                p->fb = 0;
+                u->fb = 0;
+                v->fb = 0;
+            } else if (v->fb == 1) {
+                p->fb = -1;
+                u->fb = 0;
+                v->fb = 0;
             }
-      return raiz;
-    }
-    } 
-  }
+
+          return rotacaoDuplaEsquerda(raiz);
+
+        }
+   }else{
+      
+        
+        arvore u = p->esq;        
+
+        if (u->fb <= 0) {
+            if (u->fb == -1) {
+                p->fb = 0;
+                u->fb = 0;
+            } else {
+                p->fb = 1;
+                u->fb = -1;
+            }
+            return rotacaoSimplesDireita(raiz);
+
+        } else {
+            arvore v = u->dir;
+
+            if (v->fb == -1) {
+                p->fb = 1;
+                u->fb = 0;
+                v->fb = 0;
+            } else if (v->fb == 0) {
+                p->fb = 0;
+                u->fb = 0;
+                v->fb = 0;
+            } else if (v->fb == 1) {
+                p->fb = 0;
+                u->fb = -1;
+                v->fb = 0;
+            }
+            return rotacaoDuplaDireita(raiz);
+   }
+   }
 }
+void avlRemove(arvore *raiz, int valor, int *diminuiu) {
+    if (*raiz == NULL) {
+        *diminuiu = 0;
+        return;
+    } 
+    
+    if (valor < (*raiz)->valor) {
+        avlRemove(&((*raiz)->esq), valor, diminuiu);
+    } 
+    else if (valor > (*raiz)->valor) {
+        avlRemove(&((*raiz)->dir), valor, diminuiu);
+    } 
+    else {  // Nó encontrado
+        *diminuiu = 1;
+
+        if ((*raiz)->esq == NULL && (*raiz)->dir == NULL) {
+            free(*raiz);
+            *raiz = NULL;
+        } 
+        else if ((*raiz)->esq == NULL) {
+            arvore temp = *raiz;
+            *raiz = (*raiz)->dir;
+            free(temp);
+        } 
+        else if ((*raiz)->dir == NULL) {
+            arvore temp = *raiz;
+            *raiz = (*raiz)->esq;
+            free(temp);
+        } 
+        else {
+            arvore esqmost = (*raiz)->esq;
+            while (esqmost->dir != NULL) {
+                esqmost = esqmost->dir;
+            }
+            (*raiz)->valor = esqmost->valor;
+            avlRemove(&((*raiz)->esq), esqmost->valor, diminuiu);
+        }
+    }
+
+    // Ajustar fator de balanceamento e rotacionar se necessário
+    if (*raiz != NULL && *diminuiu) {
+        if ((*raiz)->fb == -1) {
+            *diminuiu = 1;
+            (*raiz)->fb = 0;
+        } 
+        else if ((*raiz)->fb == 0) {
+            *diminuiu = 0;
+            (*raiz)->fb = 1;
+        } 
+        else if ((*raiz)->fb == 1) {
+            *raiz = rotacionar(*raiz);
+        }
+    }
+}
+
 
 // Impressões 
 void imprimirPreOrdem(arvore raiz){
@@ -313,7 +292,7 @@ void imprimirPreOrdem(arvore raiz){
 void imprimirEmOrdem(arvore raiz){
   if(raiz){  
     imprimirEmOrdem(raiz->esq);
-    printf("%d ", raiz->valor);
+    printf("[%d fb=%d]", raiz->valor, raiz->fb);
     imprimirEmOrdem(raiz->dir);
   }
 }

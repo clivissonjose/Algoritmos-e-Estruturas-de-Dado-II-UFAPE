@@ -18,13 +18,14 @@ int main(){
         a = inserir(a, valor, &cresceu);
         break;
       case 2:
-        imprimirPreOrdem(a);
-        printf("\n");
+        // imprimirPreOrdem(a);
+        // printf("\n");
         imprimirEmOrdem(a);
+        printf("\n");
         break;
       case 3:
         scanf("%d", &valor);
-        a = remover(a, valor, &diminuiu);
+        avlRemove(&a, valor, &diminuiu);
         break;
       case 99:
          exit(0);

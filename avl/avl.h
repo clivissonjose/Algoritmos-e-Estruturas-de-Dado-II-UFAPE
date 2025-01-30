@@ -10,7 +10,7 @@ typedef struct no_avl{
 typedef no_avl *arvore;
 
 arvore inserir(arvore raiz, int valor, int *cresceu);
-arvore remover(arvore raiz, int valor, int *diminuiu);
+void avlRemove(arvore *raiz, int valor, int *diminuiu);
 int altura(arvore raiz);
 arvore rotacionar(arvore raiz);
 arvore rotacaoSimplesDireita(arvore raiz);
