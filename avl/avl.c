@@ -228,57 +228,88 @@ void avlRemove(arvore *raiz, int valor, int *diminuiu) {
     if (*raiz == NULL) {
         *diminuiu = 0;
         return;
-    } 
-    
-    if (valor < (*raiz)->valor) {
-        avlRemove(&((*raiz)->esq), valor, diminuiu);
-    } 
-    else if (valor > (*raiz)->valor) {
-        avlRemove(&((*raiz)->dir), valor, diminuiu);
-    } 
-    else {  // Nó encontrado
+    } else if (valor == (*raiz)->valor) {
         *diminuiu = 1;
 
+        // Caso 1: Nó a ser removido é uma folha
         if ((*raiz)->esq == NULL && (*raiz)->dir == NULL) {
             free(*raiz);
             *raiz = NULL;
-        } 
-        else if ((*raiz)->esq == NULL) {
-            arvore temp = *raiz;
-            *raiz = (*raiz)->dir;
-            free(temp);
-        } 
-        else if ((*raiz)->dir == NULL) {
+        }
+        // Caso 2: Nó a ser removido tem apenas o filho esquerdo
+        else if ((*raiz)->esq != NULL && (*raiz)->dir == NULL) {
             arvore temp = *raiz;
             *raiz = (*raiz)->esq;
             free(temp);
-        } 
+        }
+        // Caso 3: Nó a ser removido tem apenas o filho direito
+        else if ((*raiz)->esq == NULL && (*raiz)->dir != NULL) {
+            arvore temp = *raiz;
+            *raiz = (*raiz)->dir;
+            free(temp);
+        }
+        // Caso 4: Nó a ser removido tem dois filhos
         else {
             arvore esqmost = (*raiz)->esq;
             while (esqmost->dir != NULL) {
                 esqmost = esqmost->dir;
             }
+
+            // Substitui o valor do nó a ser removido pelo maior da subárvore esquerda
             (*raiz)->valor = esqmost->valor;
-            avlRemove(&((*raiz)->esq), esqmost->valor, diminuiu);
+
+            // Remove o maior da subárvore esquerda
+            avlRemove(&(*raiz)->esq, esqmost->valor, diminuiu);
+
+            // Ajuste do fator de balanceamento após a remoção
+            if (*diminuiu) {
+                if ((*raiz)->fb == -1) {
+                    (*raiz)->fb = 0;
+                    *diminuiu = 1;
+                } else if ((*raiz)->fb == 0) {
+                    (*raiz)->fb = 1;
+                    *diminuiu = 0;
+                } else if ((*raiz)->fb == 1) {
+                    *raiz = rotacionar(*raiz);
+                }
+            }
         }
     }
+    // Se o valor a ser removido for menor que o valor do nó atual
+    else if (valor < (*raiz)->valor) {
+        avlRemove(&(*raiz)->esq, valor, diminuiu);
 
-    // Ajustar fator de balanceamento e rotacionar se necessário
-    if (*raiz != NULL && *diminuiu) {
-        if ((*raiz)->fb == -1) {
-            *diminuiu = 1;
-            (*raiz)->fb = 0;
-        } 
-        else if ((*raiz)->fb == 0) {
-            *diminuiu = 0;
-            (*raiz)->fb = 1;
-        } 
-        else if ((*raiz)->fb == 1) {
-            *raiz = rotacionar(*raiz);
+        // Ajuste do fator de balanceamento após a remoção
+        if (*diminuiu) {
+            if ((*raiz)->fb == -1) {
+                (*raiz)->fb = 0;
+                *diminuiu = 1;
+            } else if ((*raiz)->fb == 0) {
+                (*raiz)->fb = 1;
+                *diminuiu = 0;
+            } else if ((*raiz)->fb == 1) {
+                *raiz = rotacionar(*raiz);
+            }
+        }
+    }
+    // Se o valor a ser removido for maior que o valor do nó atual
+    else {
+        avlRemove(&(*raiz)->dir, valor, diminuiu);
+
+        // Ajuste do fator de balanceamento após a remoção
+        if (*diminuiu) {
+            if ((*raiz)->fb == -1) {
+                *raiz = rotacionar(*raiz);
+            } else if ((*raiz)->fb == 0) {
+                (*raiz)->fb = -1;
+                *diminuiu = 0;
+            } else if ((*raiz)->fb == 1) {
+                (*raiz)->fb = 0;
+                *diminuiu = 1;
+            }
         }
     }
 }
-
 
 // Impressões 
 void imprimirPreOrdem(arvore raiz){

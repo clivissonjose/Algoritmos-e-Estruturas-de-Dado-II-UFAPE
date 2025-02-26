@@ -1,0 +1,5 @@
+
+Comando para compilar e rodar os testes no terminal linux: 
+
+1 -  gcc main.c rb.c -o rb
+2 -  ./rb < rb.in > rb.test
