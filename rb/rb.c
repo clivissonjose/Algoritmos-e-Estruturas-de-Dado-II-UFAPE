@@ -353,11 +353,11 @@ void remover (int valor, arvore *raiz) {
     while(posicao != NULL) {
       if(valor == posicao->dado) {
         //elemento possui dois filhos
-              if(posicao->esq != NULL && posicao->dir != NULL) { 
+          if(posicao->esq != NULL && posicao->dir != NULL) { 
                   posicao->dado = maior_elemento(posicao->esq);   
                   remover(posicao->dado, &(posicao->esq));
                   break;
-              }
+          }
 
         //O elemento possui apenas um filho (direito)
         if(posicao->esq == NULL && posicao->dir != NULL) {
@@ -371,11 +371,11 @@ void remover (int valor, arvore *raiz) {
             if(eh_filho_esquerdo(posicao)) {
                 posicao->pai->esq = posicao->dir;
             } else {
-              posicao->pai->dir = posicao->dir;
-              }
+                posicao->pai->dir = posicao->dir;
+            }
                           
           }
-                  free(posicao);   
+          free(posicao);   
           break;
         }
 
@@ -394,6 +394,9 @@ void remover (int valor, arvore *raiz) {
                 posicao->pai->dir = posicao->esq;
               }
             }
+
+            free(posicao);
+            break;
         }
 
         //O elemento não possui filhos
@@ -509,96 +512,73 @@ void reajustar(arvore *raiz, arvore elemento){
     // caso 4
     if(cor(elemento->pai) == VERMELHO && cor(irmao(elemento)) == PRETO &&
        cor(irmao(elemento)->dir) == PRETO && cor(irmao(elemento)->esq) == PRETO){
-
+        printf("Caso  4\n");
         elemento->pai->cor = PRETO;
         irmao(elemento)->cor = VERMELHO;
         retira_duplo_preto(raiz, elemento);
         return;
     }
 
-      // printf("Indo caso 4 remocao\n");
-      // printf("Cor do elemento pai\n");
-      // imprimir_cor(elemento->pai);
-      // printf("Cor do irmao:\n");
-      // imprimir_cor(irmao(elemento));
-      // printf("Cor do filho  direito irmao: \n");
-      // imprimir_cor(irmao(elemento)->dir);
-      // printf("Cor do filho esquerdo do irmao: \n");
-      // imprimir_cor(irmao(elemento)->esq);
-
-      // if(cor(elemento->pai) == VERMELHO && cor(irmao(elemento)) == PRETO  &&
-      //    cor(irmao(elemento)->dir) == PRETO && cor(irmao(elemento)->esq) == PRETO){
-
-      //      elemento->pai->cor =  PRETO;
-      //      irmao(elemento)->cor = VERMELHO;
-      //      retira_duplo_preto(raiz, elemento);
-      //      return;
-      // }
-    //   //Casos 5 e 6 ficam mais fáceis separando o esquerdo do direito
-    // //caso 5a
-      if(cor(irmao(elemento)) == PRETO && cor(irmao(elemento)->esq)== VERMELHO && cor(irmao(elemento)->dir) == PRETO) {	
-
+      // Casos 5 e 6 ficam mais fáceis separando o esquerdo do direito
+      //caso 5a
+      if(eh_filho_esquerdo(elemento) && cor((irmao(elemento))) == PRETO && cor(irmao(elemento)->esq)== VERMELHO && cor(irmao(elemento)->dir) == PRETO) {	
+        
+           printf("Caso 5a\n");
            rotacao_simples_direita(raiz, irmao(elemento));
            elemento->pai->dir->dir->cor = VERMELHO;
            //irmao(elemento)->dir->cor = VERMELHO;
            reajustar(raiz, elemento);
-          return;
+           return;
       }
 
-    // //caso 5b
-    if(cor(irmao(elemento)) == PRETO && cor(irmao(elemento)->dir) == VERMELHO && cor(irmao(elemento)->esq) ==  PRETO) {	
+      // //caso 5b
+      if(!eh_filho_esquerdo(elemento) && cor((irmao(elemento))) == PRETO && cor(irmao(elemento)->dir) == VERMELHO && cor(irmao(elemento)->esq) ==  PRETO) {	
+           printf("Caso 5b\n");
 
-          rotacao_simples_esquerda(raiz, elemento->pai->esq);
-          irmao(elemento)->esq->cor = VERMELHO;
-          reajustar(raiz, elemento);
-          return;
-    }
+            rotacao_simples_esquerda(raiz, elemento->pai->esq);
+            irmao(elemento)->esq->cor = VERMELHO;
+            reajustar(raiz, elemento);
+            return;
+      }
 
-    // //caso 6a  X é vermelho
-      if(cor(irmao(elemento)) == PRETO && cor(irmao(elemento)->dir) == VERMELHO) {	
-          // as cores de x e p não mudam, entao vamos registrar elas.
-         // printf("x é roxo y vermelho\n");
-         // printf("Pai:antes da Rotacao %d\n", elemento->pai->dado);
-          arvore corPai = elemento->pai;  
-        //  arvore corIrmao = irmao(elemento)->esq;
+     //caso 6a
+    //  printf("Caso 6a\n");
+    //  printf("Pai = %d\n irmao= %d\n sobrinho direito: %d\n", elemento->pai->dado, irmao(elemento)->dado, irmao(elemento)->dir->dado);
+	   if(eh_filho_esquerdo(elemento) && cor(irmao(elemento)) == PRETO && cor(irmao(elemento)->dir) == VERMELHO){
+         
+          // Salvar cor do pai antes da rotação.
+          arvore pai = elemento->pai;
+          rotacao_simples_esquerda(raiz, elemento->pai);
 
-          rotacao_simples_direita(raiz, elemento->pai);
-          printf("Pai: %d\n", elemento->pai->dado);
-          retira_duplo_preto(raiz,elemento);
-
-          printf("cor p: %d\n", corPai->cor);
-          if(cor(corPai) == VERMELHO){
-            elemento->pai->pai->cor = VERMELHO;
-
-          }else{
-            elemento->pai->pai->cor = PRETO;
-          }
+          elemento->pai->pai->cor = pai->cor;
           elemento->pai->cor = PRETO;
           tio(elemento)->cor = PRETO;
-         // irmao(elemento)->cor = corIrmao->cor;
-
+          retira_duplo_preto(raiz, elemento);
           return;
+
       }
 
-    // //caso 6b // Caso  dos slides
-      // if() {		
-      //       return;
-      // }
-      arvore corPai =  elemento->pai;
-      rotacao_simples_esquerda(raiz, elemento->pai);
-      retira_duplo_preto(raiz, elemento);
+    //caso 6b
+    if(!eh_filho_esquerdo(elemento) && cor(irmao(elemento)) == PRETO && cor(irmao(elemento)->esq) == VERMELHO){
 
-      if(cor(corPai) == VERMELHO){
-        elemento->pai->pai->cor = VERMELHO;
+          arvore pai = elemento->pai;
+          rotacao_simples_direita(raiz, elemento->pai);
+        
+          if(cor(pai) == VERMELHO) 
+            elemento->pai->pai->cor = VERMELHO;
+          else 
+            elemento->pai->pai->cor = PRETO;
 
-      }else{
-        elemento->pai->pai->cor = PRETO;
-      }
+          
+       
+          elemento->pai->cor = PRETO;
+          tio(elemento)->cor = PRETO;
+          retira_duplo_preto(raiz, elemento);
+          return;
 
-      elemento->pai->cor =  PRETO;
-      tio(elemento)->cor = PRETO;
+    }
 
-      return;
+    printf("Nenhum caso\n");
 
 }
 
