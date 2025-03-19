@@ -37,12 +37,13 @@ void ajustar(arvore *raiz, arvore elemento);
 void reajustar(arvore *raiz, arvore elemento);
 void rotacao_simples_direita(arvore *raiz, arvore pivo);
 void rotacao_simples_esquerda(arvore *raiz, arvore pivo);
+void rotacaoDuplaDireita(arvore raiz);
+void rotacaoDuplaEsquerda(arvore raiz);
 
 
 enum cor cor(arvore elemento);
 int eh_raiz(arvore elemento);
 int eh_filho_esquerdo(arvore elemento);
-int eh_filho_direito(arvore elemento);
 arvore irmao(arvore elemento);
 arvore tio(arvore elemento);
 void retira_duplo_preto(arvore *raiz, arvore elemento);

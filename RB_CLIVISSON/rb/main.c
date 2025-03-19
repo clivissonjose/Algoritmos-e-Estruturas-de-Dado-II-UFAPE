@@ -22,7 +22,7 @@ int  main(){
          pre_order(a);
          printf("\n");
          break;
-      case 3:
+      case 5:
          scanf("%d", &valor);
          remover(valor, &a);
          break;

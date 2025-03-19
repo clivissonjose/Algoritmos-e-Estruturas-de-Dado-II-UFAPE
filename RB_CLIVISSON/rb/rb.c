@@ -181,18 +181,14 @@ void rotacao_simples_direita(arvore *raiz, arvore pivo){
     int posicao_pivo_esq = eh_filho_esquerdo(pivo);
     
     //Atualização dos ponteiros
-    u->dir = pivo;
-    u->pai = pivo->pai;
-    pivo->pai = u;
-
     pivo->esq = t1;
     if(t1 != NULL)
         t1->pai = pivo;
 
-    // u->dir = pivo;
+    u->dir = pivo;
 
-    // u->pai = pivo->pai;
-    // pivo->pai = u;
+    u->pai = pivo->pai;
+    pivo->pai = u;
 
     //Se não existir árvore acima de u, u passa a ser a raiz da árvore
     if(eh_raiz(u))
@@ -213,18 +209,14 @@ void rotacao_simples_esquerda(arvore *raiz, arvore pivo) {
 
     int posicao_pivo_esq = eh_filho_esquerdo(pivo);
 
-    u->esq = pivo;
-    u->pai = pivo->pai;
-    pivo->pai = u;
-
     pivo->dir = t1;
 
     if(t1 != NULL) t1->pai = pivo; 
 
-    // u->esq = pivo;
+    u->esq = pivo;
 
-    // u->pai = pivo->pai;
-    // pivo->pai = u;
+    u->pai = pivo->pai;
+    pivo->pai = u;
 
        //Se não existir árvore acima de u, u passa a ser a raiz da árvore
     if(eh_raiz(u)) *raiz = u;
@@ -257,10 +249,6 @@ int eh_raiz(arvore elemento) {
 /*Verifica se um nó é filho esquerdo*/
 int eh_filho_esquerdo(arvore elemento) {
     return (elemento->pai != NULL && elemento == elemento->pai->esq);
-}
-
-int eh_filho_direito(arvore elemento){
-  return (elemento->pai != NULL && elemento == elemento->pai->dir);
 }
 
 arvore tio(arvore elemento) {
@@ -369,85 +357,105 @@ void imprimir_elemento(arvore raiz) {
     case VERMELHO:
       printf("[%d R]", raiz->dado);
       break;
-   
+    case DUPLO_PRETO:
+      printf("[%d DB]", raiz->dado);
+      break;
   }
 }
 
+void remover (int valor, arvore *raiz) {
+      arvore posicao;
+      posicao = *raiz;
 
-void remover(tipo_dado valor, arvore *raiz) {
-	arvore posicao = *raiz;
+    while(posicao != NULL) {
+      if(valor == posicao->dado) {
+        //elemento possui dois filhos
+          if(posicao->esq != NULL && posicao->dir != NULL) { 
+                  posicao->dado = maior_elemento(posicao->esq);   
+                  remover(posicao->dado, &(posicao->esq));
+                  break;
+          }
 
-	while(posicao != NULL) {
-		if(valor == posicao->dado) {
-			if(posicao->esq == NULL && posicao->dir == NULL) {
-				if(eh_raiz(posicao)) {
-					*raiz = NULL;
-                    free(posicao);
-					break;
-				}
-				if(posicao->cor == VERMELHO) {
-					if(eh_filho_esquerdo(posicao))
-						posicao->pai->esq = NULL;
-					else
-						posicao->pai->dir = NULL;
+        //O elemento possui apenas um filho (direito)
+        if(posicao->esq == NULL && posicao->dir != NULL) {
+                  //O seu filho direito sobe para a posição do elemento  a ser removido e recebe a cor preta
+                  posicao->dir->cor = PRETO;
+                  posicao->dir->pai = posicao->pai;
 
-                    free(posicao);
-					break;
-				}
-				else {
-                    no_null->cor = DUPLO_PRETO;
-                    no_null->pai = posicao->pai;
-
-                    if(eh_filho_esquerdo(posicao))
-                        posicao->pai->esq = no_null;
-                    else
-                        posicao->pai->dir = no_null;
-
-                    free(posicao);
-                    reajustar(raiz, no_null);
-                    break;
-				}
-			}
-			if(posicao->esq == NULL && posicao->dir != NULL) {
-				posicao->dir->cor = PRETO;
-                posicao->dir->pai = posicao->pai;
-
-				if(eh_raiz(posicao))
-					*raiz = posicao->dir;
-				else {
-					if(eh_filho_esquerdo(posicao))
-                        posicao->pai->esq = posicao->dir;
-					else
-                        posicao->pai->dir = posicao->dir;
-				}
-                free(posicao);
-				break;
-			}
-			if(posicao->esq != NULL && posicao->dir == NULL) {
-				posicao->esq->cor = PRETO;
-                posicao->esq->pai = posicao->pai;
-
-				if(eh_raiz(posicao))
-					*raiz = posicao->esq;
-				else {
-					if(eh_filho_esquerdo(posicao))
-                        posicao->pai->esq = posicao->esq;
-					else
-                        posicao->pai->dir = posicao->esq;
-				}
-                free(posicao);
-				break;
-			}
-            else {
-                posicao->dado = maior_elemento(posicao->esq);
-                valor = posicao->dado;
+          if(eh_raiz(posicao)) {
+            *raiz = posicao->dir;
+          } else {
+            if(eh_filho_esquerdo(posicao)) {
+                posicao->pai->esq = posicao->dir;
+            } else {
+                posicao->pai->dir = posicao->dir;
             }
-		}
-		if(valor > posicao->dado)
-            posicao = posicao->dir;
-		else
-            posicao = posicao->esq;
-	}
+                          
+          }
+          free(posicao);   
+          break;
+        }
+
+
+        //O elemento possui apenas um filho (esquerdo)
+        if(posicao->esq != NULL && posicao->dir == NULL) {
+            posicao->esq->cor =  PRETO;
+            posicao->esq->pai = posicao->pai;
+
+            if(eh_raiz(posicao)){
+              *raiz = posicao->esq;
+            }else{
+              if(eh_filho_esquerdo(posicao)){
+                posicao->pai->esq = posicao->esq;
+              }else{
+                posicao->pai->dir = posicao->esq;
+              }
+            }
+
+            free(posicao);
+            break;
+        }
+
+        //O elemento não possui filhos
+        if(posicao->esq == NULL && posicao->dir == NULL) {
+          //Remover raiz sem filhos					
+          if(eh_raiz(posicao)) {
+            *raiz = NULL;
+             free(posicao);
+            break;
+          }
+
+          //Remover elemento que não possui filhos e não é raiz
+          //Se for vermelho, apenas remove atualizando o ponteiro 
+          //correspondente do pai
+          if(posicao->cor == VERMELHO) {
+            if(eh_filho_esquerdo(posicao))
+              posicao->pai->esq = NULL;
+            else
+              posicao->pai->dir = NULL;
+              free(posicao);
+              break;
+          } else {
+              //Se o elemento for preto, substitui pelo duplo preto e depois ajusta a árvore
+              no_null->cor = DUPLO_PRETO;
+              no_null->pai = posicao->pai;
+              if(eh_filho_esquerdo(posicao))
+                posicao->pai->esq = no_null;
+              else
+                posicao->pai->dir = no_null;
+
+              free(posicao);
+              reajustar(raiz, no_null);
+              break;
+              
+          }
+        }
+      }	
+      if(valor > posicao->dado) 
+          posicao = posicao->dir;
+      else 
+          posicao = posicao->esq;
+    }
 }
 /*
 Funcao para imprimir  cores dos nós
@@ -489,8 +497,7 @@ void reajustar(arvore *raiz, arvore elemento){
     //caso 2
     if(cor(elemento->pai) == PRETO && cor(irmao(elemento)) == VERMELHO &&
        cor(irmao(elemento)->dir) == PRETO && cor(irmao(elemento)->esq) == PRETO ) {
-           
-        //printf("Caso 2\n");
+
           //Verifica se é o caso 2 esquerdo ou direito
           if(eh_filho_esquerdo(elemento))
               rotacao_simples_esquerda(raiz, elemento->pai);
@@ -510,8 +517,8 @@ void reajustar(arvore *raiz, arvore elemento){
     if(cor(elemento->pai) == PRETO && cor(irmao(elemento)) == PRETO &&
        cor(irmao(elemento)->dir) == PRETO && cor(irmao(elemento)->esq) == PRETO) {
 
-         irmao(elemento)->cor = VERMELHO;
          elemento->pai->cor = DUPLO_PRETO;
+         irmao(elemento)->cor = VERMELHO;
          retira_duplo_preto(raiz, elemento);
           //Verificar e remover o no_null
           //Chamada recursiva para eliminar o duplo preto do elemento P
@@ -531,33 +538,34 @@ void reajustar(arvore *raiz, arvore elemento){
 
       // Casos 5 e 6 ficam mais fáceis separando o esquerdo do direito
       //caso 5a
-      if(eh_filho_esquerdo(elemento) && cor(irmao(elemento)) == PRETO && cor(irmao(elemento)->esq)== VERMELHO && cor(irmao(elemento)->dir) == PRETO) {	
+      if(eh_filho_esquerdo(elemento) && cor((irmao(elemento))) == PRETO && cor(irmao(elemento)->esq)== VERMELHO && cor(irmao(elemento)->dir) == PRETO) {	
         
-        rotacao_simples_direita(raiz, irmao(elemento));
-        irmao(elemento)->cor = PRETO;
-        irmao(elemento)->dir->cor = VERMELHO;
-        reajustar(raiz, elemento);
-        return;
+           printf("Caso 5a\n");
+           rotacao_simples_direita(raiz, irmao(elemento));
+           elemento->pai->dir->dir->cor = VERMELHO;
+           //irmao(elemento)->dir->cor = VERMELHO;
+           reajustar(raiz, elemento);
+           return;
       }
 
       // //caso 5b
-      if(!eh_filho_esquerdo(elemento) && cor(irmao(elemento)) == PRETO && cor(irmao(elemento)->dir) == VERMELHO && cor(irmao(elemento)->esq) ==  PRETO) {	
-          // printf("Caso 5b\n");
+      if(!eh_filho_esquerdo(elemento) && cor((irmao(elemento))) == PRETO && cor(irmao(elemento)->dir) == VERMELHO && cor(irmao(elemento)->esq) ==  PRETO) {	
+           printf("Caso 5b\n");
 
-          rotacao_simples_esquerda(raiz, irmao(elemento));
-          irmao(elemento)->cor = PRETO;
-          irmao(elemento)->esq->cor = VERMELHO;
-          reajustar(raiz, elemento);
-          return;
+            rotacao_simples_esquerda(raiz, elemento->pai->esq);
+            irmao(elemento)->esq->cor = VERMELHO;
+            reajustar(raiz, elemento);
+            return;
       }
 
      //caso 6a
 	   if(eh_filho_esquerdo(elemento) && cor(irmao(elemento)) == PRETO && cor(irmao(elemento)->dir) == VERMELHO){
-        // printf("Caso 6a\n");
-
+         
+          // Salvar cor do pai antes da rotação.
+          arvore pai = elemento->pai;
           rotacao_simples_esquerda(raiz, elemento->pai);
-          elemento->pai->pai->cor = elemento->pai->cor;
 
+          elemento->pai->pai->cor = pai->cor;
           elemento->pai->cor = PRETO;
           tio(elemento)->cor = PRETO;
           retira_duplo_preto(raiz, elemento);
@@ -566,21 +574,16 @@ void reajustar(arvore *raiz, arvore elemento){
       }
 
     //caso 6b
-    // printf("caso 6b antes...\n");
-    // printf("Filho esquerdo: %d\n", !eh_filho_esquerdo(elemento));
-    // printf("Cor do imao do elemento: ");
-    // imprimir_cor(irmao(elemento));
-    // printf("\n");
-    // printf("Cor do sobrinho esquerdo: ");
-    // imprimir_cor(irmao(elemento));
-    // printf("\n");
     if(!eh_filho_esquerdo(elemento) && cor(irmao(elemento)) == PRETO && cor(irmao(elemento)->esq) == VERMELHO){
 
-          
+          arvore pai = elemento->pai;
           rotacao_simples_direita(raiz, elemento->pai);
+        
+          if(cor(pai) == VERMELHO) 
+            elemento->pai->pai->cor = VERMELHO;
+          else 
+            elemento->pai->pai->cor = PRETO;
        
-          elemento->pai->pai->cor = elemento->pai->cor;
-
           elemento->pai->cor = PRETO;
           tio(elemento)->cor = PRETO;
           retira_duplo_preto(raiz, elemento);
@@ -589,7 +592,6 @@ void reajustar(arvore *raiz, arvore elemento){
     }
 
 }
-
 
 void retira_duplo_preto(arvore *raiz, arvore elemento) {
     if(elemento == no_null)
